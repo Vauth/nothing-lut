@@ -106,7 +106,24 @@ const updateKeyStatus = () => {
 
 const renderParams = () => {
     els.paramsContainer.innerHTML = '';
-    Object.entries(state.currentParams).forEach(([key, value]) => {
+    
+    // FIX: Iterate over DEFAULT_PARAMS keys only.
+    // This ignores any extra junk keys (like "thought_process") the AI might send.
+    Object.keys(DEFAULT_PARAMS).forEach((key) => {
+        
+        // Get value, defaulting to the default if missing
+        let value = state.currentParams[key];
+
+        // SAFETY: Force convert to number in case AI sent a string like "0.5"
+        if (typeof value !== 'number') {
+            value = parseFloat(value);
+        }
+
+        // Double check: if it's still not a number (NaN), use 0
+        if (isNaN(value)) {
+            value = DEFAULT_PARAMS[key] || 0;
+        }
+
         const percent = getVisualPercent(key, value);
         const niceKey = key.replace(/[A-Z]/g, ' $&');
         
@@ -126,7 +143,6 @@ const renderParams = () => {
         els.paramsContainer.insertAdjacentHTML('beforeend', html);
     });
 };
-
 const updateCanvas = () => {
     const canvas = els.previewCanvas;
     const ctx = canvas.getContext('2d');
