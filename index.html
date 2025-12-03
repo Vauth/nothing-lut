@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nothing Lut AI</title>
+    <link rel="icon" type="image/png" href="images/favicon.png"> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body class="h-screen flex flex-col dot-matrix-bg relative">
+
+    <header class="flex-none px-6 py-4 z-50 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-[#D71921] flex items-center justify-center font-ndot text-xl text-black font-bold">N</div>
+            <div class="flex flex-col">
+                <h1 class="text-xl font-ndot uppercase tracking-wider text-white leading-none">
+                    Nothing<span class="text-[#D71921]">Lut</span>
+                </h1>
+                <span class="text-[10px] text-gray-500 font-mono">AI_EDITION_V6.0</span>
+            </div>
+        </div>
+        
+        <div class="flex gap-3">
+            <button onclick="toggleAIModal()" class="btn-circle px-4 py-2 rounded-full border border-[#D71921] bg-[#D71921]/10 text-[#D71921] hover:bg-[#D71921] hover:text-white flex items-center gap-2 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span class="font-ndot text-sm uppercase hidden md:inline">Ask AI</span>
+            </button>
+            
+            <button onclick="toggleLiveCamera()" class="btn-circle w-10 h-10 rounded-full border border-gray-700 bg-black/50 text-white flex items-center justify-center hover:border-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+
+            <button onclick="document.getElementById('fileInput').click()" class="btn-circle w-10 h-10 rounded-full border border-gray-700 bg-black/50 text-white flex items-center justify-center hover:border-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            </button>
+            <input type="file" id="fileInput" accept="image/*" class="hidden">
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col lg:flex-row overflow-hidden relative z-10 px-4 pb-4 gap-4">
+        
+        <div class="flex-grow relative rounded-[2rem] overflow-hidden border border-[#222] bg-[#080808] flex items-center justify-center group" id="previewArea">
+            
+            <div id="emptyState" class="text-center opacity-20 pointer-events-none">
+                <div class="text-7xl font-ndot text-white mb-4">EMPTY</div>
+                <div class="w-16 h-16 rounded-full border-2 border-dashed border-white mx-auto animate-spin-slow"></div>
+            </div>
+
+            <canvas id="mainCanvas" class="max-w-full max-h-full object-contain hidden transition-opacity duration-300"></canvas>
+            <video id="sourceVideo" playsinline autoplay class="hidden"></video>
+
+            <div id="liveOverlay" class="absolute inset-0 pointer-events-none hidden">
+                <div class="absolute top-4 right-4 flex gap-2">
+                     <div class="flex items-center gap-2 bg-black/60 border border-white/10 px-3 py-1.5 rounded-full backdrop-blur-md">
+                        <div class="w-2 h-2 rounded-full bg-[#D71921] animate-pulse"></div>
+                        <span class="text-[10px] font-ndot text-white uppercase tracking-widest">LIVE</span>
+                    </div>
+                </div>
+                <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-4 pointer-events-auto">
+                    <button onclick="flipCamera()" class="w-12 h-12 rounded-full bg-black/60 border border-white/20 text-white flex items-center justify-center hover:bg-white/10 backdrop-blur-md">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </button>
+                    <button onclick="captureFromLive()" class="w-16 h-16 rounded-full border-4 border-white flex items-center justify-center hover:scale-105 transition-transform bg-transparent">
+                        <div class="w-14 h-14 bg-white rounded-full"></div>
+                    </button>
+                    <button onclick="stopCamera()" class="w-12 h-12 rounded-full bg-black/60 border border-white/20 text-white flex items-center justify-center hover:bg-white/10 backdrop-blur-md">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="aiLoader" class="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-50 hidden">
+                <div class="relative w-full max-w-md h-64 overflow-hidden rounded-xl border border-red-900/30">
+                    <div class="ai-scan"></div>
+                    <div class="absolute inset-0 flex items-center justify-center font-ndot text-[#D71921] text-2xl tracking-widest animate-pulse">
+                        GENERATING PARAMETERS...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full lg:w-[420px] glass-panel rounded-[2rem] flex flex-col h-[50vh] lg:h-auto z-20 overflow-hidden shadow-2xl">
+            
+            <div class="flex p-2 bg-black/20 m-2 rounded-full">
+                <button onclick="switchTab('basic')" id="tab-basic" class="flex-1 py-2 rounded-full font-ndot text-xs uppercase tracking-wider text-black bg-white shadow-lg transition-all">Basic</button>
+                <button onclick="switchTab('color')" id="tab-color" class="flex-1 py-2 rounded-full font-ndot text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-all">Split</button>
+                <button onclick="switchTab('advanced')" id="tab-advanced" class="flex-1 py-2 rounded-full font-ndot text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-all">Adv</button>
+                <button onclick="switchTab('export')" id="tab-export" class="flex-1 py-2 rounded-full font-ndot text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-all">Save</button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto px-6 py-4 space-y-8 custom-scroll relative">
+                
+                <button onclick="resetFilters()" class="absolute top-0 right-6 text-[10px] font-mono text-red-500 hover:text-white uppercase tracking-wider z-10 opacity-70 hover:opacity-100 mt-2">Reset All</button>
+
+                <div id="panel-basic" class="space-y-5 pt-4 animate-fade-in">
+                    <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Exposure</label><span id="val-brightness">0</span></div>
+                        <input type="range" id="brightness" min="-100" max="100" value="0" oninput="updateFilter('brightness')">
+                    </div>
+                    <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Contrast</label><span id="val-contrast">0</span></div>
+                        <input type="range" id="contrast" min="-100" max="100" value="0" oninput="updateFilter('contrast')">
+                    </div>
+                    <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Saturation</label><span id="val-saturation">0</span></div>
+                        <input type="range" id="saturation" min="-100" max="100" value="0" oninput="updateFilter('saturation')">
+                    </div>
+                     <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Temp</label><span id="val-warmth">0</span></div>
+                        <input type="range" id="warmth" min="-50" max="50" value="0" oninput="updateFilter('warmth')">
+                    </div>
+                    
+                     <div class="p-4 rounded-2xl bg-white/5 border border-white/10 mt-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="font-ndot text-sm text-white uppercase">Nothing Mono</span>
+                                <span class="text-[10px] text-gray-500">Isolate Red Channel</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="monoMode" class="sr-only peer" onchange="updateFilter()">
+                                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D71921]"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="panel-color" class="space-y-6 pt-4 hidden animate-fade-in">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                        <h3 class="font-ndot text-xs text-[#D71921] uppercase mb-4">Shadows Tint</h3>
+                        <div class="space-y-3">
+                            <input type="range" id="shadowR" min="-50" max="50" value="0" oninput="updateFilter('shadowR')" class="accent-red-500">
+                            <input type="range" id="shadowG" min="-50" max="50" value="0" oninput="updateFilter('shadowG')" class="accent-green-500">
+                            <input type="range" id="shadowB" min="-50" max="50" value="0" oninput="updateFilter('shadowB')" class="accent-blue-500">
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+                        <h3 class="font-ndot text-xs text-yellow-500 uppercase mb-4">Highlights Tint</h3>
+                        <div class="space-y-3">
+                            <input type="range" id="highlightR" min="-50" max="50" value="0" oninput="updateFilter('highlightR')" class="accent-red-500">
+                            <input type="range" id="highlightG" min="-50" max="50" value="0" oninput="updateFilter('highlightG')" class="accent-green-500">
+                            <input type="range" id="highlightB" min="-50" max="50" value="0" oninput="updateFilter('highlightB')" class="accent-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Global Tint (G/M)</label><span id="val-tint">0</span></div>
+                        <input type="range" id="tint" min="-50" max="50" value="0" oninput="updateFilter('tint')">
+                    </div>
+                </div>
+
+                <div id="panel-advanced" class="space-y-5 pt-4 hidden animate-fade-in">
+                     <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Gamma</label><span id="val-gamma">1.0</span></div>
+                        <input type="range" id="gamma" min="0.1" max="2.0" step="0.1" value="1.0" oninput="updateFilter('gamma')">
+                    </div>
+                    <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Highlights</label><span id="val-highlights">0</span></div>
+                        <input type="range" id="highlights" min="-100" max="100" value="0" oninput="updateFilter('highlights')">
+                    </div>
+                    <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Shadows</label><span id="val-shadows">0</span></div>
+                        <input type="range" id="shadows" min="-100" max="100" value="0" oninput="updateFilter('shadows')">
+                    </div>
+                    <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Fade (Lift)</label><span id="val-fade">0</span></div>
+                        <input type="range" id="fade" min="0" max="100" value="0" oninput="updateFilter('fade')">
+                    </div>
+                    <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Vibrance</label><span id="val-vibrance">0</span></div>
+                        <input type="range" id="vibrance" min="-100" max="100" value="0" oninput="updateFilter('vibrance')">
+                    </div>
+                     <div class="control-group">
+                        <div class="flex justify-between font-mono text-[10px] text-gray-400 mb-2 uppercase tracking-widest"><label>Posterize</label><span id="val-posterize">0</span></div>
+                        <input type="range" id="posterize" min="0" max="100" value="0" oninput="updateFilter('posterize')">
+                    </div>
+                </div>
+
+                <div id="panel-export" class="hidden animate-fade-in flex flex-col h-full">
+                    <div class="space-y-4 flex-grow">
+                        <div class="p-5 border border-[#333] rounded-2xl bg-black/40">
+                            <h3 class="font-ndot text-white mb-2 tracking-wide">METADATA</h3>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="bg-white/5 p-2 rounded text-[10px] text-gray-400 font-mono">TYPE: .CUBE</div>
+                                <div class="bg-white/5 p-2 rounded text-[10px] text-gray-400 font-mono">SIZE: 33x33x33</div>
+                                <div class="bg-white/5 p-2 rounded text-[10px] text-gray-400 font-mono">PRECISION: FLOAT</div>
+                                <div class="bg-white/5 p-2 rounded text-[10px] text-gray-400 font-mono">GAMUT: REC.709</div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="font-mono text-[10px] text-gray-500 uppercase pl-2">Filter Name</label>
+                            <input type="text" id="lutName" placeholder="FILTER_NAME" class="w-full bg-[#111] border border-[#333] text-white p-4 rounded-xl focus:border-[#D71921] focus:outline-none font-ndot uppercase tracking-widest transition-colors text-center">
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pb-4">
+                        <button onclick="downloadLUT()" class="btn-circle w-full py-4 bg-[#D71921] hover:bg-red-600 text-white font-ndot text-lg uppercase tracking-widest shadow-[0_5px_30px_rgba(215,25,33,0.3)] flex items-center justify-center gap-3 rounded-xl">
+                            <span>Download .CUBE</span>
+                        </button>
+                        
+                        <button onclick="downloadImage()" class="btn-circle w-full py-4 border border-[#333] hover:bg-[#222] text-gray-300 font-ndot text-sm uppercase tracking-widest flex items-center justify-center gap-2 rounded-xl">
+                            <span>Save Image</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="aiModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-[#111] border border-[#333] w-full max-w-lg rounded-3xl p-6 shadow-2xl transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-ndot text-2xl text-white"><span class="text-[#D71921]">AI</span> Generator</h2>
+                <button onclick="toggleAIModal()" class="text-gray-500 hover:text-white">✕</button>
+            </div>
+            
+            <div class="mb-5">
+                <label class="block text-[10px] text-gray-500 font-mono uppercase mb-2">Gemini API Key (Required)</label>
+                <input type="password" id="apiKeyInput" class="w-full bg-black border border-[#333] rounded-xl p-3 text-white font-mono text-xs focus:border-[#D71921] focus:outline-none placeholder-gray-700" placeholder="Paste your API key here...">
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[10px] text-[#D71921] hover:underline mt-1 inline-block">Get API Key &rarr;</a>
+            </div>
+
+            <p class="text-gray-400 text-xs font-mono mb-4">Describe the look you want (e.g., "Vintage 1980s polaroid", "Cyberpunk neon teal and orange", "Moody cinematic horror").</p>
+            
+            <textarea id="aiPrompt" rows="3" class="w-full bg-black border border-[#333] rounded-xl p-4 text-white font-mono text-sm focus:border-[#D71921] focus:outline-none resize-none mb-6" placeholder="Enter prompt..."></textarea>
+            
+            <button onclick="runAIGeneration()" class="btn-circle w-full py-4 bg-white text-black font-ndot text-lg uppercase hover:bg-gray-200 rounded-xl">
+                Generate Filter
+            </button>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[200] flex flex-col gap-2 pointer-events-none w-full max-w-sm px-4"></div>
+
+    <script src="scripts/script.js"></script>
+</body>
+</html>
