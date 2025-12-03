@@ -1,58 +1,32 @@
-# NothingLut - Cinematic Color Processor
+# LUTai - AI Color Grading Generator
+LUTai is a static web application that generates cinematic 3D LUTs (Look Up Tables) from natural language descriptions. It uses the Google Gemini API to translate mood and lighting prompts into precise color grading parameters, including ASC-CDL, white balance, and split toning.
 
 <br>
 
-## Overview
-
-**NothingLut** is a web-based color grading tool. It allows users to apply highly detailed, real-time color corrections to images or live camera feeds (on supported devices) and export the final look as a standard **.CUBE Look-Up Table (LUT)** file for use for Nothing Phone Cameras.
-A unique feature is the integrated **AI Generator**, powered by the Gemini API, which creates complex color filters based on descriptive text prompts.
-
-<br>
-
-## Key Features
-
-* **Real-time Processing:** Apply filter effects instantly to uploaded images or live camera input (requires modern browser/HTTPS).
-* **Gemini AI Integration:** Generate custom filter parameters using descriptive prompts like "Vintage 1980s polaroid" or "Moody cinematic horror." 
-* **Nothing Mono Mode:** Instantly isolate and enhance the **Red** channel while desaturating the rest, mimicking the unique Nothing OS aesthetic.
-* **Advanced Control:** Fine-tune the image with comprehensive controls including **Exposure, Contrast, Gamma, Split Toning** (Shadows/Highlights tint), and **Vibrance**.
-* **LUT Export:** Export your final custom look as a 33x33x33 **.CUBE LUT** file, compatible with virtually all professional video and photo editors.
+## Features
+- **Text-to-LUT:** Describe a look (e.g., "Bleak Russian winter", "Warm golden hour") and the AI generates the color math.
+- **Real-time Preview:** Upload your own reference image to see the grade applied instantly.
+- **Advanced Color Science:** Manipulates exposure, contrast, saturation, temperature, tint, lift, gamma, gain, and split toning.
+- **Universal Export:** Downloads standard .CUBE files compatible with DaVinci Resolve, Adobe Premiere Pro, Final Cut Pro, and OBS.
+- **Privacy Focused:** Runs entirely in the browser. Your images are never uploaded to a server; only the text prompt is sent to the AI.
 
 <br>
 
-## How to Use
-
-### 1. Load an Image or Go Live
-
-* Click the **"File Load"** button (up arrow icon) to upload a photo from your device.
-* Click the **"Camera Toggle"** button (camera icon) to start the live feed from your device's camera.
-
-### 2. Basic Grading
-
-Use the **Basic** tab for quick adjustments:
-* Use **Exposure** and **Contrast** for foundational light correction.
-* Use **Saturation** to control color intensity.
-* Toggle **Nothing Mono** to apply the signature aesthetic.
-
-### 3. AI Generation
-
-1.  Click the **"Ask AI"** button (lightning bolt icon).
-2.  Paste your **Gemini API Key** into the required field (you can get one from the link provided in the modal).
-3.  Enter a detailed prompt describing the desired aesthetic (e.g., "Dark, moody teal and orange look for a night scene").
-4.  Click **"Generate Filter"**. The AI will return a complete set of values for the controls, instantly applying the look to your image.
-
-### 4. Export the Look
-
-1.  Switch to the **Save** tab.
-2.  Enter a name for your filter in the `Filter Name` field (e.g., `CYBERPUNK_NIGHT`).
-3.  Click **"Download .CUBE"** to generate and save the professional LUT file.
-4.  Alternatively, click **"Save Image"** to download the currently visible, processed image as a PNG.
+## Getting an API Key
+- Go to Google AI Studio.
+- Create a free API Key.
+- Paste the key into the LUTai interface when prompted.
+- The key is used temporarily within your browser session to fetch parameters.
 
 <br>
+
+## Browser Support
+This project uses modern JavaScript (ES6+) and Canvas APIs. It works best in Chrome, Firefox, Safari, and Edge.
 
 <br>
 
 ## Live Demo
-Check out the live demo [here](https://vauth.github.io/nothing-lut).
+Check out the live demo [here](https://vauth.github.io/lutai).
 
 <br>
 
